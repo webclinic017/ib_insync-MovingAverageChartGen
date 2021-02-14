@@ -1,4 +1,3 @@
-#test commit
 #9SMA Watchlist
 SMA9_securities = [#'20210319'
     ["APHA", "NASDAQ", "cannabis", "cannabis", .96],

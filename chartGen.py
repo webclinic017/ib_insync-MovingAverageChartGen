@@ -128,8 +128,8 @@ def plot_d(pdata, sma9, sma20, sma50, sma200, lowerbb, upperbb, numofdays, ticke
                 # figscale=.9,
                 tight_layout=False,
                 ylabel='',
-                savefig=f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
-    chartFilePath = f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
+                savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
+    chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
     chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
@@ -145,8 +145,8 @@ def plot_j1(pdata, sma9, sma20, sma50, lowerbb, upperbb, numofdays, ticker, defi
                 # figscale=.9,
                 tight_layout=False,
                 ylabel='',
-                savefig=f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
-    chartFilePath = f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
+                savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
+    chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
     chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
@@ -161,8 +161,8 @@ def plot_j2(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma
                 # figscale=.9,
                 tight_layout=False,
                 ylabel='',
-                savefig=f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
-    chartFilePath = f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
+                savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
+    chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
     chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
@@ -177,8 +177,8 @@ def plot_j3(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma
                 # figscale=.9,
                 tight_layout=False,
                 ylabel='',
-                savefig=f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
-    chartFilePath = f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
+                savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
+    chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
     chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 

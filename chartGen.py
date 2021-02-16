@@ -231,7 +231,7 @@ ib = IB()
 ib.connect('127.0.0.1', 7497, clientId=1)
 
 # create new folder daily to store charts
-path = f'''/Users/mike/Desktop/chartGen/9-200SMA_{today_date}'''
+path = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}'''
 os.mkdir(path)
 
 drive = google_drive_authentication()

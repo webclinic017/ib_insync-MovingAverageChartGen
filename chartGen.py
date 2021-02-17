@@ -228,7 +228,8 @@ hits = []
 
 # connect to IBKR api (TWS Workstation Paper Trading)
 ib = IB()
-ib.connect('127.0.0.1', 7497, clientId=4)
+if ib.isConnected() == False:
+    ib.connect('127.0.0.1', 7497, clientId=4)
 
 # create new folder daily to store charts
 path = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}'''

@@ -3,7 +3,6 @@
 # ...creation, stock buckets (self) for securities watchlist, datetime for date
 from ib_insync import *
 import pandas as pd
-from statistics import stdev
 import mplfinance as mpf
 import os
 from buckets import *
@@ -11,6 +10,8 @@ from datetime import datetime, date
 today_date = date.today().strftime('%m-%d-%y')
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+
+from subplot import masubplot, upperbb_subplot, lowerbb_subplot
 
 # authenticate Google Drive user and save credentials to file
 def google_drive_authentication():
@@ -60,42 +61,6 @@ def extract_closing(singlestock_bardata):
         closing_prices.append((singlestock_bardata[day]['BarData']['close']))
     return closing_prices
 
-# create desired length moving average list of values for charting
-def create_masubplot(length, closing_prices):
-    ma_length = length
-    i = 0
-    averages = {'data':[]}
-    while i < len(closing_prices) - ma_length + 1:
-        this_window = closing_prices[i : i + ma_length]
-        window_average = round(sum(this_window) / ma_length, 2)
-        averages['data'].append(window_average)
-        i += 1
-    return averages
-
-# create desired upper bollinger band list of values for charting
-def create_upperbb_subplot(closing_prices, period, std):
-    length = period
-    i = 0
-    bb = {'data':[]}
-    while i < len(closing_prices) - length + 1:
-        this_window = closing_prices[i : i + length]
-        window_bb = round((sum(this_window) / length) + (2.5 * stdev(this_window)), 2)
-        bb['data'].append(window_bb)
-        i += 1
-    return bb
-
-# create desired lower bollinger band list of values for charting
-def create_lowerbb_subplot(closing_prices, period, std):
-    length = period
-    i = 0
-    bb = {'data':[]}
-    while i < len(closing_prices) - length + 1:
-        this_window = closing_prices[i : i + length]
-        window_bb = round((sum(this_window) / length) - (2.5 * stdev(this_window)), 2)
-        bb['data'].append(window_bb)
-        i += 1
-    return bb
-
 # reformat dict of IBKR values for mplfinance charting
 def reformat_IBdata(fetched_data):
     reformatted_data = {}
@@ -131,7 +96,7 @@ def plot_d(pdata, sma9, sma20, sma50, sma200, lowerbb, upperbb, numofdays, ticke
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # create chart of candlesticks, 9SMA, 20SMA, 50SMA, Bollinger Bands for stocks w/ partial data
 def plot_j1(pdata, sma9, sma20, sma50, lowerbb, upperbb, numofdays, ticker, defining_ma):
@@ -148,7 +113,7 @@ def plot_j1(pdata, sma9, sma20, sma50, lowerbb, upperbb, numofdays, ticker, defi
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # create chart of candlesticks, 9SMA, 20SMA, Bollinger Bands for stocks w/ less days of data
 def plot_j2(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma):
@@ -164,7 +129,7 @@ def plot_j2(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # create abbreviated chart of candlesticks, 9SMA, 20SMA, Bollinger Bands for stocks w/ minimal days of data
 def plot_j3(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma):
@@ -180,7 +145,7 @@ def plot_j3(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # print best chart possible for available days of data... if ValueError still persists, print len of lists for debugging
 def plot_total(bucket, bucket_nickname, days):
@@ -226,17 +191,22 @@ def plot_total(bucket, bucket_nickname, days):
 hits = []
 
 
+# # connect to IBKR api (TWS Workstation Paper Trading)
+# ib = IB()
+# if ib.isConnected() == False:
+#     ib.connect('127.0.0.1', 7497, clientId=4)
+
 # connect to IBKR api (TWS Workstation Paper Trading)
 ib = IB()
 if ib.isConnected() == False:
-    ib.connect('127.0.0.1', 7497, clientId=4)
+    ib.connect('127.0.0.1', 4002, clientId=4)
 
 # create new folder daily to store charts
 path = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}'''
 os.mkdir(path)
 
-drive = google_drive_authentication()
-daily_folder_id = create_new_daily_folder(drive)
+# drive = google_drive_authentication()
+# daily_folder_id = create_new_daily_folder(drive)
 
 
 # cycle through all baskets indefinitely, print chart when conditions are met
@@ -245,15 +215,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data(SMA9_securities[security][0], SMA9_securities[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        sma9 = create_masubplot(9, closing_prices)
+        sma9 = masubplot(9, closing_prices)
         if SMA9_securities[security][0] not in hits:
             if (closing_prices[len(closing_prices)-1] < (SMA9_securities[security][4] * sma9['data'][len(sma9['data'])-1])):
                 hits.append(SMA9_securities[security][0])
-                sma20 = create_masubplot(20, closing_prices)
-                sma50 = create_masubplot(50, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma20 = masubplot(20, closing_prices)
+                sma50 = masubplot(50, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total(SMA9_securities, '9SMA', 60)
             else:
@@ -264,15 +234,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data(SMA20_securities[security][0], SMA20_securities[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        sma20 = create_masubplot(20, closing_prices)
+        sma20 = masubplot(20, closing_prices)
         if SMA20_securities[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] < (SMA20_securities[security][4] * sma20['data'][len(sma20['data'])-1]):
                 hits.append(SMA20_securities[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma50 = create_masubplot(50, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma50 = masubplot(50, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total(SMA20_securities, '20SMA', 75)
             else:
@@ -283,15 +253,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data( SMA50_securities_A[security][0],  SMA50_securities_A[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        sma50 = create_masubplot(50, closing_prices)
+        sma50 = masubplot(50, closing_prices)
         if  SMA50_securities_A[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] < ( SMA50_securities_A[security][4] * sma50['data'][len(sma50['data'])-1]):
                 hits.append( SMA50_securities_A[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma20 = create_masubplot(20, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma20 = masubplot(20, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total( SMA50_securities_A, '50SMA', 120)
             else:
@@ -302,15 +272,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data( SMA50_securities_B[security][0],  SMA50_securities_B[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        sma50 = create_masubplot(50, closing_prices)
+        sma50 = masubplot(50, closing_prices)
         if  SMA50_securities_B[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] < ( SMA50_securities_B[security][4] * sma50['data'][len(sma50['data'])-1]):
                 hits.append( SMA50_securities_B[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma20 = create_masubplot(20, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma20 = masubplot(20, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total( SMA50_securities_B, '50SMA', 120)
             else:
@@ -321,15 +291,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data( SMA50_securities_C[security][0],  SMA50_securities_C[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        sma50 = create_masubplot(50, closing_prices)
+        sma50 = masubplot(50, closing_prices)
         if  SMA50_securities_C[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] < ( SMA50_securities_C[security][4] * sma50['data'][len(sma50['data'])-1]):
                 hits.append( SMA50_securities_C[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma20 = create_masubplot(20, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma20 = masubplot(20, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total( SMA50_securities_C, '50SMA', 120)
             else:
@@ -340,15 +310,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data(SMA200_securities[security][0], SMA200_securities[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        sma200 = create_masubplot(200, closing_prices)
+        sma200 = masubplot(200, closing_prices)
         if SMA200_securities[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] < (SMA200_securities[security][4] * sma200['data'][len(sma200['data'])-1]):
                 hits.append(SMA200_securities[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma20 = create_masubplot(20, closing_prices)
-                sma50 = create_masubplot(50, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma20 = masubplot(20, closing_prices)
+                sma50 = masubplot(50, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total(SMA200_securities, '200SMA', 120)
             else:
@@ -359,15 +329,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data(BB_securities[security][0], BB_securities[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
+        lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
         if BB_securities[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] < (1 * lowerbb['data'][len(lowerbb['data'])-1]):
                 hits.append(BB_securities[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma20 = create_masubplot(20, closing_prices)
-                sma50 = create_masubplot(50, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma20 = masubplot(20, closing_prices)
+                sma50 = masubplot(50, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                upperbb = upperbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total(BB_securities, 'LowerBB', 120)
             else:
@@ -378,15 +348,15 @@ while True:
         ib.sleep(1)
         fetched_data = fetch_data(BB_securities[security][0], BB_securities[security][1], '365 D')
         closing_prices = extract_closing(fetched_data)
-        upperbb = create_upperbb_subplot(closing_prices, 20, 2.5)
+        upperbb = upperbb_subplot(closing_prices, 20, 2.5)
         if BB_securities[security][0] not in hits:
             if closing_prices[len(closing_prices)-1] > (1 * upperbb['data'][len(upperbb['data'])-1]):
                 hits.append(BB_securities[security][0])
-                sma9 = create_masubplot(9, closing_prices)
-                sma20 = create_masubplot(20, closing_prices)
-                sma50 = create_masubplot(50, closing_prices)
-                sma200 = create_masubplot(200, closing_prices)
-                lowerbb = create_lowerbb_subplot(closing_prices, 20, 2.5)
+                sma9 = masubplot(9, closing_prices)
+                sma20 = masubplot(20, closing_prices)
+                sma50 = masubplot(50, closing_prices)
+                sma200 = masubplot(200, closing_prices)
+                lowerbb = lowerbb_subplot(closing_prices, 20, 2.5)
                 pdata = reformat_IBdata(fetched_data)
                 plot_total(BB_securities, 'UpperBB', 120)
             else:

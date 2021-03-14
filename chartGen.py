@@ -8,42 +8,9 @@ import os
 from buckets import *
 from datetime import datetime, date
 today_date = date.today().strftime('%m-%d-%y')
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 
 from subplot import masubplot, upperbb_subplot, lowerbb_subplot
-
-# authenticate Google Drive user and save credentials to file
-def google_drive_authentication():
-    gauth = GoogleAuth()
-    gauth.LoadCredentialsFile("mycreds.txt")
-    if gauth.credentials is None:
-        gauth.LocalWebserverAuth()
-    elif gauth.access_token_expired:
-        gauth.Refresh()
-    else:
-        gauth.Authorize()
-    gauth.SaveCredentialsFile("mycreds.txt")
-    drive = GoogleDrive(gauth)
-    return drive
-
-#create daily folder on Google Drive
-def create_new_daily_folder(GoogleDriveObject):
-    file_metadata = {'title': f'''{today_date} CHARTS''',
-                     'parents': [{'id': '1htYh7OIGirRpNxFvZIOD5TTwBqvsBxw9',
-                                  'kind': 'drive#childList'}],
-                     'mimeType': 'application/vnd.google-apps.folder'}
-    folder = GoogleDriveObject.CreateFile(file_metadata)
-    folder.Upload()
-    return folder['id']
-
-def chart_file_upload(GoogleDriveObject, parentFolderKey, filePath, fileTitle):
-    file_metadata = {'title': fileTitle,
-                     'parents': [{'id': parentFolderKey,
-                                  'kind': 'drive#childList'}]}
-    file = GoogleDriveObject.CreateFile(file_metadata)
-    file.SetContentFile(filePath)
-    file.Upload()
+from googledrive import gdrive_authentication, gdrive_new_daily_folder, gdrive_file_upload
 
 # get daily historical bar data from IBKR api
 def fetch_data(ticker, prime_exch, data_barcount):
@@ -96,7 +63,7 @@ def plot_d(pdata, sma9, sma20, sma50, sma200, lowerbb, upperbb, numofdays, ticke
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # gdrive_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # create chart of candlesticks, 9SMA, 20SMA, 50SMA, Bollinger Bands for stocks w/ partial data
 def plot_j1(pdata, sma9, sma20, sma50, lowerbb, upperbb, numofdays, ticker, defining_ma):
@@ -113,7 +80,7 @@ def plot_j1(pdata, sma9, sma20, sma50, lowerbb, upperbb, numofdays, ticker, defi
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # gdrive_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # create chart of candlesticks, 9SMA, 20SMA, Bollinger Bands for stocks w/ less days of data
 def plot_j2(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma):
@@ -129,7 +96,7 @@ def plot_j2(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # gdrive_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # create abbreviated chart of candlesticks, 9SMA, 20SMA, Bollinger Bands for stocks w/ minimal days of data
 def plot_j3(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma):
@@ -145,7 +112,7 @@ def plot_j3(pdata, sma9, sma20, lowerbb, upperbb, numofdays, ticker, defining_ma
                 savefig=f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf''')
     chartFilePath = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}/{ticker}_{defining_ma}_{today_date}.pdf'''
     chartFileTitle = f'''{ticker}_{defining_ma}_{today_date}.pdf'''
-    # chart_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
+    # gdrive_file_upload(drive, daily_folder_id, chartFilePath, chartFileTitle)
 
 # print best chart possible for available days of data... if ValueError still persists, print len of lists for debugging
 def plot_total(bucket, bucket_nickname, days):
@@ -205,8 +172,8 @@ if ib.isConnected() == False:
 path = f'''/Users/mike/Desktop/ib_insync-MovingAverageChartGen/9-200SMA_{today_date}'''
 os.mkdir(path)
 
-# drive = google_drive_authentication()
-# daily_folder_id = create_new_daily_folder(drive)
+# drive = gdrive_authentication()
+# daily_folder_id = gdrive_new_daily_folder(drive)
 
 
 # cycle through all baskets indefinitely, print chart when conditions are met
